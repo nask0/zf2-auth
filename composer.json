@@ -1,0 +1,22 @@
+{
+    "name": "nask0/zf2-auth",
+    "description": "Zend Framework 2 module CRAM auth",
+    "license": "BSD 2-clause",
+    "keywords": ["zf2", "auth"],
+    "homepage": "https://github.com/nask0/zf2-auth.git",
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "2.*"
+    },
+    "require-dev": {
+        "zendframework/zendframework": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "CRAMauth": "src"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
