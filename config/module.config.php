@@ -1,6 +1,2 @@
 <?php
-return array(
-    'CRAMauth' => array(
-        'loginFormRoute' => '',
-    )
-);
+return array();
