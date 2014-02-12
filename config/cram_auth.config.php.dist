@@ -1,0 +1,8 @@
+<?php
+return array(
+    'CRAMauth' => array(
+        'cryptAlgorithm' => 'sha512',
+        'identityField' => 'email',
+        'credentialField' => 'password'
+    ),
+);

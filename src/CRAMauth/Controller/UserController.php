@@ -36,26 +36,23 @@ class UserController extends AbstractActionController
         // ...or configure the instance with setter methods
         $authAdapter = new AuthAdapter($dbAdapter);
 
-        $authAdapter
-            ->setTableName('users')
-            ->setIdentityColumn('email')
-            ->setCredentialColumn('password');
+        $authAdapter->setTableName('users')
+                    ->setIdentityColumn('email')
+                    ->setCredentialColumn('password');
 
-        $authAdapter
-            ->setIdentity('my_username')
-            ->setCredential('my_password');
+        $authAdapter->setIdentity('my_username')
+                    ->setCredential('my_password');
 
         // Print the identity
-        echo $authAdapter->getIdentity() . "\n\n";
+        // echo $authAdapter->getIdentity() . "\n\n";
 
         // Print the result row
-        echo 'asdad';
-        var_dump(get_class_methods($authAdapter));
-        var_dump($authAdapter->authenticate());
-        exit;
+        // echo 'asdad';
+        // var_dump(get_class_methods($authAdapter));
+        // var_dump($authAdapter->authenticate());
 
-        var_dump($authAdapter);
-        exit;
+        //var_dump($authAdapter);
+        // exit;
 
         // var_dump($dbAdapter);
          /*   $arr = array('edno' => 2, 'asd' => array(123 => 'asdasd'));
