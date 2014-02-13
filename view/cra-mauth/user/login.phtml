@@ -1,0 +1,26 @@
+<?php // i know, i know, move on for now, and call me idiot later ?>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha512.js"></script>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script>
+<script>
+    function authUser() {
+        var key = ''+CryptoJS.SHA512(document.forms[0].elements[1].value)+'';
+        var challenge = document.forms[0].elements[2].value;
+
+        document.forms[0].elements[1].value = CryptoJS.HmacSHA512(challenge, key); // DO NOT remove '' since there is a bug in Google;
+        document.forms[0].submit();
+    }
+</script>
+<div class="container">
+    <h2 class="form-signin-heading">Please sign in</h2>
+
+    <form method="post" class="form-signin" role="form" onsubmit="authUser();">
+        <input type="text" name="email" class="form-control" placeholder="Email address" required autofocus>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+        <input type="hidden" name="challenge" value="<?php echo $this->loginChallenge; ?>" />
+
+        <label class="checkbox">
+            <input type="checkbox" value="remember-me"> Remember me
+        </label>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+</div>

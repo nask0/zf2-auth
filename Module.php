@@ -3,12 +3,16 @@ namespace CRAMauth;
 
 class Module
 {
+    /**
+     * @param $e - Zend\Mvc\MvcEvent
+     */
     public function onBootstrap($e)
     {
         // Register a "render" event, at high priority (so it executes prior to the view attempting to render)
         $app = $e->getApplication();
         $app->getEventManager()->attach('render', array($this, 'registerJsonStrategy'), 100);
     }
+
 
     public function registerJsonStrategy($e)
     {
@@ -23,7 +27,9 @@ class Module
 
     public function getConfig()
     {
-        return (include __DIR__ . '/config/module.config.php');
+        return
+            (include __DIR__ . '/config/module.config.php') +
+            (include __DIR__ . '/config/routes.config.php');
     }
 
     public function getAutoloaderConfig()

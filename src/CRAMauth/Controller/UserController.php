@@ -3,17 +3,14 @@
 namespace CRAMauth\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
-use Zend\Authentication\Adapter\DbTable as AuthAdapter;
-use Zend\View\Model\JsonModel;
+
+//use Zend\View\Model\JsonModel;
 
 
 class UserController extends AbstractActionController
 {
-    private $_challenge = array('hash' =>  '',
-                                'expired' => false
-                               );
-
     /*protected $acceptMapping = array(
         'Zend\View\Model\JsonModel' => array(
             'application/json'
@@ -24,59 +21,72 @@ class UserController extends AbstractActionController
 
     public function indexAction()
     {
+        return new JsonModel();
+    }
+
+    public function getUserIdentity($email)
+    {
+        // @todo : add interface for this in order to keep modular structure
         $dbAdapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
 
-        // Configure the instance with constructor parameters...
-        /*$authAdapter = new AuthAdapter($dbAdapter,
-            'users',
-            'username',
-            'password'
-        );*/
+        $queryResult = $dbAdapter->query('SELECT * FROM users WHERE email = ? AND user_role = ?')
+                                 ->execute(array($email, 'admin'));
 
-        // ...or configure the instance with setter methods
-        $authAdapter = new AuthAdapter($dbAdapter);
-
-        $authAdapter->setTableName('users')
-                    ->setIdentityColumn('email')
-                    ->setCredentialColumn('password');
-
-        $authAdapter->setIdentity('my_username')
-                    ->setCredential('my_password');
-
-        // Print the identity
-        // echo $authAdapter->getIdentity() . "\n\n";
-
-        // Print the result row
-        // echo 'asdad';
-        // var_dump(get_class_methods($authAdapter));
-        // var_dump($authAdapter->authenticate());
-
-        //var_dump($authAdapter);
-        // exit;
-
-        // var_dump($dbAdapter);
-         /*   $arr = array('edno' => 2, 'asd' => array(123 => 'asdasd'));
-        $a = new \ArrayIterator($arr);
-        $a->offsetSet('someGoodie', 'extra');
-        $a->offsetSet('__challenge', $this->_generateChallenge());*/
-
-        return new JsonModel(array());
+        return $queryResult->current();
     }
 
-    public function getChallengeAction()
+    public function logoutAction()
     {
+        // @todo : make redirect url configurable & others...
+        $userSession = new Container('userSession');
+        $userSession->isLogged = false;
+
+        return $this->redirect()->toRoute('admin');
     }
 
-    private function _generateChallenge()
+    public function loginAction()
     {
-        $this->_challenge['hash'] = '';
-        $this->_challenge['expired'] = true;
+        $view = new ViewModel();
+        $userSession = new Container('userSession');
 
-        for ($a=1; $a<=20; $a++) {
-            $this->_challenge['hash'] .= chr(mt_rand(48,125));
+        $request = $this->getRequest();
+
+        if ( $request->isPost() ) {
+            $post = $request->getPost();
+
+            if ( false !== ($user = $this->getUserIdentity($post['email'])) ) {
+                $hmacValue = hash_hmac('sha512', $post['challenge'], $user['password']);
+
+                if ( $hmacValue === $post['password']) {
+                    $userSession->isLogged = true;
+                    return $this->redirect()->toRoute('admin');
+                }
+            } else {
+                // @todo : unable to find user
+                $userSession->isLogged = false;
+            }
         }
 
-        $this->_challenge['expired'] = false;
-        return $this->_challenge['hash'];
+        if ( true === $userSession->challengeExpired ) {
+            $this->__regenerateChallenge();
+        }
+
+        $view->loginChallenge = $userSession->challengeHash;
+        $userSession->challengeExpired = true;
+
+        return $view;
+    }
+
+    private function __regenerateChallenge()
+    {
+        // generate challenge string
+        $userSession = new Container('userSession');
+
+        $challengeHash = '';
+        for ($a=1; $a<=20; $a++) {
+            $challengeHash .= chr(mt_rand(48,125));
+        }
+        $userSession->challengeExpired = false;
+        $userSession->challengeHash = $challengeHash;
     }
 }
