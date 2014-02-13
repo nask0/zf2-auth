@@ -49,6 +49,7 @@ class UserController extends AbstractActionController
         $view = new ViewModel();
         $userSession = new Container('userSession');
 
+        $this->layout('layout/login');
         $request = $this->getRequest();
 
         if ( $request->isPost() ) {
